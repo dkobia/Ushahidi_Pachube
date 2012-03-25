@@ -1,0 +1,28 @@
+#pachube-form .forms_fields{
+	display:none;
+	margin:0 20px 15px 20px;
+	padding:10px;
+	background-color:#eee;
+	border-bottom:2px solid #ccc;
+}
+#pachube-form .forms_fields_add{
+	display:none;
+	margin:10px 0 0 15px;
+}
+#pachube-form .forms_fields_new{
+	display:none;
+	border:1px dashed #ccc;
+	padding:10px 10px 0 10px;
+	margin-top:5px;
+	background-color:#fff;
+}
+#pachube-form .feed_triggers_current{
+	border-bottom: 1px solid #ccc;
+	padding-bottom: 10px;
+	margin-bottom: 10px;
+}
+#pachube-form .feed_triggers{
+	padding-bottom:5px;
+	margin-bottom:5px;
+	border-bottom:1px dotted #ccc;
+}
