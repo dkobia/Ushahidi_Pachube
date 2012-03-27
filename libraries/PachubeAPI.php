@@ -1,7 +1,7 @@
 <?php
 /**
  * Pachube API class
- * Version 0.3 (June 2011)
+ * Version 0.4 (March 2012)
  * Requirements: PHP5, cURL, API v.2.0
  *
  * This program is free software; you can redistribute it and/or modify
@@ -178,9 +178,21 @@ class PachubeAPI
 		$url = "http://$this->Pachube/feeds/$feed/datastreams/$datastream";
 		return $this->_deleteRequest($url);
 	}
+
+	/**
+	 * Create trigger
+	 * @param string format of output ("json", "xml", "csv")
+	 * @param string data to update
+	 * @return http response headers
+	 */
+	public function createTrigger($format=false, $data)
+	{
+		$url = "http://$this->Pachube/triggers";
+		if($format && ($format == "json" || $format == "csv" || $format == "xml")) $url .= ".". $format;
+		return $this->_postRequest($url, $data);
+	}	
 	
 	// ToDo: DataPoints
-	// ToDo: Triggers
 	// ToDo: Users: List, Create, Update, Delete
 	// ToDo: API keys
 	

@@ -23,20 +23,37 @@ function feedAction ( action, confirmAction, id )
 }
 
 // Create Trigger
-function createTrigger ( feed_id, stream_id ){
-	$.post("<?php echo url::site() . 'admin/pachube/trigger' ?>", { 
+function createTrigger ( feed_id, stream_id, stream ){
+	$("#trigger_btn_"+stream_id).attr('value','Loading...');
+	$.post("<?php echo url::site() . 'admin/pachube/add_trigger' ?>", { 
 		feed_id: feed_id,
 		stream_id: stream_id,
-		trigger: $("#").val(),
-		trigger_type: $("#").val(),
-		category_id:  $("#").val()
+		stream: stream,
+		trigger: $("#trigger_value_"+stream_id).val(),
+		trigger_type: $("#trigger_type_"+stream_id).val(),
+		category_id: $("#trigger_category_"+stream_id).val()
 	},
 	function(data){
 		if (data.status == 'success'){
-			$('#form_fields_' + form_id).html('');
-			$('#form_fields_' + form_id).show(300);
-			$('#form_fields_' + form_id).html(data.message);
-			$('#form_field_' + form_id +' [name=field_name]').focus();
+			$("#feedTriggersDiv_"+feed_id).append('<div id="trigger_'+data.message.id+'">&middot;&nbsp;When value '+data.message.unit+' '+$("#trigger_type_"+stream_id+" option:selected").text()+' '+$("#trigger_value_"+stream_id).val()+' post a report to '+$("#trigger_category_"+stream_id+" option:selected").text()+' [<a href="javascript:deleteTrigger('+data.message.id+')">delete</a>]</div>');
 		}
+		else
+		{
+			alert('Failed - Please make sure your values are correct!');
+		}
+
+		$("#trigger_value_"+stream_id).val('');
+		$("#trigger_btn_"+stream_id).attr('value','Add');
   	}, "json");
+}
+
+// Delete Trigger
+function deleteTrigger(id){
+	var answer = confirm('Delete this trigger?')
+	if (answer){
+		$.post("<?php echo url::site() . 'admin/pachube/del_trigger' ?>", { trigger_id: id },
+			function(data){
+				$("#trigger_"+id).remove();
+			}, "json");
+	}
 }

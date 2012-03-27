@@ -106,6 +106,7 @@ class Pachube_Controller extends Admin_Controller {
 					{
 						ORM::factory('pachube_trigger')->where('pachube_feed_id', $feed->id)->delete_all();
 						ORM::factory('pachube_datastream')->where('pachube_feed_id', $feed->id)->delete_all();
+						ORM::factory('pachube_trigger')->where('pachube_feed_id', $feed->id)->delete_all();
 						$feed->delete();
 						$form_saved = TRUE;
 						$form_action = strtoupper(Kohana::lang('ui_admin.deleted'));
@@ -160,8 +161,11 @@ class Pachube_Controller extends Admin_Controller {
 		$this->template->js = new View('pachube/admin/pachube_js');
 	}
 
-
-	public function trigger()
+	/**
+	 * Save New Triggers
+	 * @return string - json
+	 */
+	public function add_trigger()
 	{
 		$this->template = "";
 		$this->auto_render = FALSE;
@@ -177,15 +181,38 @@ class Pachube_Controller extends Admin_Controller {
 			$post->add_rules('feed_id','required', 'numeric');
 			$post->add_rules('stream_id','required', 'numeric');
 			$post->add_rules('category_id','required', 'numeric');
+			$post->add_rules('stream','required');
 			$post->add_rules('trigger','required');
 			$post->add_rules('trigger_type','required');
-
-			$post->add_callbacks('feed', array($this, 'set_trigger'));
 			
 			if ($post->validate())
 			{
-				
-				echo json_encode(array("status"=>"success", "message"=>""));
+				// Save Trigger
+				$trigger = ORM::factory('pachube_trigger');
+				$trigger->pachube_feed_id = $post->feed_id;
+				$trigger->pachube_datastream_id = $post->stream_id;
+				$trigger->category_id = $post->category_id;
+				$trigger->trigger = $post->trigger;
+				$trigger->trigger_type = $post->trigger_type;
+				$trigger->trigger_type_long = pachube_func::condition($post->trigger_type);
+				$trigger->save();
+
+				// Now Post the Trigger at Pachube
+				if ($this->_set_trigger($trigger))
+				{
+					// We have an active trigger!
+					echo json_encode(array("status"=>"success", "message"=>array(
+						'id' => $trigger->id,
+						'value' => $trigger->trigger,
+						'unit' => $trigger->pachube_datastream->datastream_unit
+						)));
+				}
+				else
+				{
+					// Couldn't set trigger - delete!
+					$trigger->delete();
+					echo json_encode(array("status"=>"error", "message"=>"Invalid Trigger"));
+				}
 			}
 			else
 			{
@@ -195,7 +222,22 @@ class Pachube_Controller extends Admin_Controller {
 		}
 	}
 
+	/**
+	 * Save New Triggers
+	 * @return string - json
+	 */
+	public function del_trigger()
+	{
+		$this->template = "";
+		$this->auto_render = FALSE;
+	}
 
+	/**
+	 * New Feed Callback
+	 * Validates Feed and requests feed details from Pachube
+	 * @param object $post
+	 * @return void
+	 */
 	public function check_feed(Validation $post)
 	{
 		// If add->rules validation found any errors, get me out of here!
@@ -245,35 +287,39 @@ class Pachube_Controller extends Admin_Controller {
 		}
 	}
 
-	public function create_trigger(Validation $post)
+	/**
+	 * Validates Trigger and posts trigger to Pachube
+	 * @param object $post
+	 * @return bool true/false
+	 */
+	private function _set_trigger($trigger)
 	{
-		// If add->rules validation found any errors, get me out of here!
-		if (array_key_exists('feed', $post->errors()))
-			return;
-
 		// Pachube Parser
 		$settings = ORM::factory('pachube_settings', 1);
 		$pachube = new PachubeAPI($settings->pachube_key);
 
-		$json = $pachube->createTrigger('json', $post->feed);
+		$data = json_encode(
+			array(
+				'threshold_value' => $trigger->trigger,
+				'url' => URL::site().'pachube/trigger/'.$trigger->id,
+				'trigger_type' => $trigger->trigger_type,
+				'environment_id' => $trigger->pachube_feed->feed,
+				'stream_id' => $trigger->pachube_datastream->datastream_id,
+				)
+			);
+
+		$json = $pachube->createTrigger('json', $data);
 		$json = json_decode($json, TRUE);
 
-		// Valid JSON?
 		if($json === null)
 		{
-			$post->add_error('feed','create_error');
-			return;
+			// Blank Response = Successful
+			//++ change this for more accurate response
+			return true;
 		}
 		else
 		{
-			// Feed Response Error?
-			if ( isset($json['errors']) OR ! isset($json['id']) )
-			{
-				$post->add_error('feed','create_error');
-				return;
-			}
-
-			
-		}		
+			return false;
+		}	
 	}
 }

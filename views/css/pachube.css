@@ -1,3 +1,14 @@
+.feed_label{
+	float:left;
+	line-height:22px;
+	background-color:#ccc;
+}
+#pachube-form .feed_triggers_current{
+	padding:10px;
+	border:1px dotted #ccc;
+	background-color:#fff;
+	margin-top:5px;
+}
 #pachube-form .forms_fields{
 	display:none;
 	margin:0 20px 15px 20px;

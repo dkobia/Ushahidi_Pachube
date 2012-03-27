@@ -67,6 +67,7 @@ class Pachube_Install {
 			  `category_id` int(11) unsigned NOT NULL DEFAULT '0',
 			  `trigger` varchar(255) DEFAULT NULL,
 			  `trigger_type` varchar(50) DEFAULT NULL,
+			  `trigger_type_long` varchar(50) DEFAULT NULL,
 			  PRIMARY KEY (`id`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 		");
@@ -76,7 +77,7 @@ class Pachube_Install {
 			CREATE TABLE `pachube_datastream` (
 			  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 			  `pachube_feed_id` int(11) unsigned NOT NULL DEFAULT '0',
-			  `datastream_id` int(11) unsigned NOT NULL DEFAULT '0',
+			  `datastream_id` varchar(100) NOT NULL DEFAULT '0',
 			  `datastream_tag` varchar(255) DEFAULT NULL,
 			  `datastream_unit` varchar(255) DEFAULT NULL,
 			  PRIMARY KEY (`id`)
