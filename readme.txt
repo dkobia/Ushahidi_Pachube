@@ -11,6 +11,8 @@ author website: http://www.dkfactor.com
 == Description ==
 Pull Pachube Feeds Into Ushahidi
 
+![Preview](http://dl.dropbox.com/u/501659/Screenshots/o43g232w83fm.png "Preview")
+
 == Installation ==
 1. Download from github, unzip and rename the folder to pachube
 2. Copy the entire /pachube/ directory into your /plugins/ directory.
