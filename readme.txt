@@ -12,7 +12,9 @@ author website: http://www.dkfactor.com
 Pull Pachube Feeds Into Ushahidi
 
 == Installation ==
-1. Copy the entire /pachube/ directory into your /plugins/ directory.
-2. Activate the plugin.
+1. Download from github, unzip and rename the folder to pachube
+2. Copy the entire /pachube/ directory into your /plugins/ directory.
+3. Activate the plugin.
+4. You'll find the Pachube menu in Manage > Pachube
 
 == Changelog ==
